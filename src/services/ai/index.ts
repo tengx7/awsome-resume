@@ -7,15 +7,23 @@
 import type {
   AIConfig,
   ChatMessage,
+  GuidancePhase,
   JDAnalysis,
+  ParsedResumeData,
   RewriteMode,
   StarScore,
+  StarImprovement,
   StreamHandlers,
 } from './types';
 import {
   getSystemPrompt,
+  guidanceChatPrompt,
+  guidanceExtractPrompt,
   jdAnalysisPrompt,
+  parseFreeTextPrompt,
+  parseResumeTextPrompt,
   rewritePrompt,
+  starImproveAllPrompt,
   starScorePrompt,
 } from './prompts';
 
@@ -208,4 +216,85 @@ export async function analyzeJD(
   ];
   const raw = await chatOnce(config, messages, { temperature: 0.3 });
   return extractJSON<JDAnalysis>(raw);
+}
+
+// ========== AI 一键成稿（Auto-Fill）高阶 API ==========
+
+/** 自由表述 → 结构化简历 */
+export async function autoFillFromText(
+  config: AIConfig,
+  text: string,
+): Promise<ParsedResumeData | null> {
+  const messages: ChatMessage[] = [
+    { role: 'system', content: getSystemPrompt(config.language) },
+    { role: 'user', content: parseFreeTextPrompt(text, config.language) },
+  ];
+  const raw = await chatOnce(config, messages, { temperature: 0.3 });
+  return extractJSON<ParsedResumeData>(raw);
+}
+
+/** 简历文件文本 → 结构化数据 */
+export async function autoFillFromResumeText(
+  config: AIConfig,
+  rawText: string,
+): Promise<ParsedResumeData | null> {
+  const messages: ChatMessage[] = [
+    { role: 'system', content: getSystemPrompt(config.language) },
+    { role: 'user', content: parseResumeTextPrompt(rawText, config.language) },
+  ];
+  const raw = await chatOnce(config, messages, { temperature: 0.3 });
+  return extractJSON<ParsedResumeData>(raw);
+}
+
+/** 问答式引导：获取 AI 下一个问题 */
+export async function guidanceGetNextQuestion(
+  config: AIConfig,
+  history: Array<{ role: string; content: string }>,
+  phase: GuidancePhase,
+  collectedInfo: Record<string, any>,
+): Promise<string> {
+  const messages: ChatMessage[] = [
+    { role: 'system', content: getSystemPrompt(config.language) },
+    { role: 'user', content: guidanceChatPrompt(history, phase, collectedInfo, config.language) },
+  ];
+  return chatOnce(config, messages, { temperature: 0.7 });
+}
+
+/** 问答式引导：从用户回答中提取结构化数据 */
+export async function guidanceExtractInfo(
+  config: AIConfig,
+  userAnswer: string,
+  phase: GuidancePhase,
+): Promise<ParsedResumeData | null> {
+  const messages: ChatMessage[] = [
+    { role: 'system', content: getSystemPrompt(config.language) },
+    { role: 'user', content: guidanceExtractPrompt(userAnswer, phase, config.language) },
+  ];
+  const raw = await chatOnce(config, messages, { temperature: 0.2 });
+  return extractJSON<ParsedResumeData>(raw);
+}
+
+/** STAR 法则批量改进工作成就 */
+export async function starImproveAll(
+  config: AIConfig,
+  achievements: string[],
+): Promise<StarImprovement[]> {
+  if (!achievements.length) return [];
+  const messages: ChatMessage[] = [
+    { role: 'system', content: getSystemPrompt(config.language) },
+    { role: 'user', content: starImproveAllPrompt(achievements, config.language) },
+  ];
+  const raw = await chatOnce(config, messages, { temperature: 0.4 });
+  const result = extractJSON<Array<{
+    original: string;
+    improved: string;
+    missingAspect: string;
+    suggestion: string;
+  }>>(raw);
+  if (!result || !Array.isArray(result)) return [];
+  return result.map((item) => ({
+    original: item.original || '',
+    improved: item.improved || '',
+    score: { total: 0, situation: 0, task: 0, action: 0, result: 0, suggestions: [item.suggestion] } as StarScore,
+  }));
 }

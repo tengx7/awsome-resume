@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AIConfig, JDAnalysis } from '../services/ai/types';
+import type { AIConfig, JDAnalysis, ChatMessageItem, GuidancePhase } from '../services/ai/types';
 import { DEFAULT_AI_CONFIG, getProviderPreset } from '../services/ai/providers';
 
 interface AIStore {
@@ -26,6 +26,11 @@ interface AIStore {
   /** 设置弹窗开关 */
   settingsOpen: boolean;
   setSettingsOpen: (b: boolean) => void;
+
+  // ========== 一键成稿（Auto-Fill）状态 ==========
+  /** 一键成稿面板开关 */
+  autoFillOpen: boolean;
+  setAutoFillOpen: (b: boolean) => void;
 
   /** 是否已配置好（可用） */
   isReady: () => boolean;
@@ -61,6 +66,10 @@ export const useAIStore = create<AIStore>()(
 
       settingsOpen: false,
       setSettingsOpen: (b) => set({ settingsOpen: b }),
+
+      // 一键成稿
+      autoFillOpen: false,
+      setAutoFillOpen: (b) => set({ autoFillOpen: b }),
 
       isReady: () => {
         const { config } = get();

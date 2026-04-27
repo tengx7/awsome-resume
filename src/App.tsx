@@ -5,6 +5,7 @@ import { PreviewPanel } from './components/PreviewPanel';
 import { SettingsPanel } from './components/SettingsPanel';
 import { AIAssistantPanel } from './components/ai/AIAssistantPanel';
 import { AISettingsModal } from './components/ai/AISettingsModal';
+import { AutoFillPanel } from './components/ai/AutoFillPanel';
 import { PenLine, Eye, Settings } from 'lucide-react';
 
 type Tab = 'edit' | 'settings';
@@ -96,6 +97,7 @@ function App() {
       {/* AI 助手 & 设置（全局挂载，受 aiStore 控制显隐） */}
       <AIAssistantPanel />
       <AISettingsModal />
+      <AutoFillPanel />
     </div>
   );
 }

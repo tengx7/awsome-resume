@@ -83,3 +83,88 @@ export interface StreamHandlers {
   onError?: (err: Error) => void;
   signal?: AbortSignal;
 }
+
+// ========== AI 一键成稿（Auto-Fill）相关类型 ==========
+
+/** AI 解析后的结构化简历数据 */
+export interface ParsedResumeData {
+  personal: {
+    name?: string;
+    title?: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+    website?: string;
+    linkedin?: string;
+    github?: string;
+    summary?: string;
+  };
+  workExperience: Array<{
+    company?: string;
+    position?: string;
+    startDate?: string;
+    endDate?: string;
+    current?: boolean;
+    description?: string;
+    achievements?: string[];
+  }>;
+  education: Array<{
+    school?: string;
+    degree?: string;
+    major?: string;
+    startDate?: string;
+    endDate?: string;
+    gpa?: string;
+    description?: string;
+  }>;
+  skills: Array<{
+    category?: string;
+    items?: string[];
+  }>;
+  projects: Array<{
+    name?: string;
+    role?: string;
+    startDate?: string;
+    endDate?: string;
+    description?: string;
+    technologies?: string[];
+    link?: string;
+  }>;
+  certificates: Array<{
+    name?: string;
+    issuer?: string;
+    date?: string;
+    link?: string;
+  }>;
+  languages: Array<{
+    name?: string;
+    level?: string;
+  }>;
+}
+
+/** 问答式引导的对话消息 */
+export interface ChatMessageItem {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
+}
+
+/** 问答式引导的状态阶段 */
+export type GuidancePhase =
+  | 'idle'
+  | 'greeting'
+  | 'basic_info'
+  | 'work_experience'
+  | 'education'
+  | 'skills'
+  | 'projects'
+  | 'review'
+  | 'done';
+
+/** STAR 改进建议 */
+export interface StarImprovement {
+  original: string;
+  improved: string;
+  score: StarScore;
+}

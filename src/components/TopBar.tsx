@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { Download, Upload, RotateCcw, FileJson, Printer, ChevronDown, Sparkles } from 'lucide-react';
+import { Download, Upload, RotateCcw, FileJson, Printer, ChevronDown, Sparkles, Wand2 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { useAIStore } from '../store/aiStore';
 import { exportToPDF, exportToJSON, importFromJSON } from '../utils/export';
 
 export const TopBar: React.FC = () => {
   const { data, settings, importData, resetToDefault } = useResumeStore();
-  const { setAssistantOpen, isReady } = useAIStore();
+  const { setAssistantOpen, setAutoFillOpen, isReady } = useAIStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showMenu, setShowMenu] = useState(false);
 
@@ -100,6 +100,22 @@ export const TopBar: React.FC = () => {
         >
           <Sparkles size={13} className="text-purple-600" />
           <span>AI 助手</span>
+          {!isReady() && (
+            <span
+              className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full animate-pulse"
+              title="尚未配置"
+            />
+          )}
+        </button>
+
+        {/* AI 一键成稿按钮 */}
+        <button
+          onClick={() => setAutoFillOpen(true)}
+          className="relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-700 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 border border-orange-200 rounded-lg transition-all"
+          title="AI 一键成稿：60 秒生成专业简历"
+        >
+          <Wand2 size={13} className="text-orange-500" />
+          <span className="hidden sm:inline">一键成稿</span>
           {!isReady() && (
             <span
               className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full animate-pulse"
