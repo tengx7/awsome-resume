@@ -16,6 +16,7 @@
 [🌐 在线体验](#快速开始) · [📖 功能特性](#功能特性) · [🗺️ 路线图](#路线图--roadmap) · [🤝 参与贡献](https://github.com/tengx7/awsome-resume/issues)
 
 </div>
+<img width="1719" height="973" alt="image" src="https://github.com/user-attachments/assets/d446c72c-fba1-41a6-8abf-1d4366a1449d" />
 
 ---
 
