@@ -1,14 +1,27 @@
-# 简历神器 · Awsome Resume
+<div align="center">
 
-一款基于 **React 18 + TypeScript + Vite** 构建的 **AI 驱动** 简历工具。不只是简历生成器 —— 支持多模板切换、岗位定向匹配度分析、一键改写 / 量化 / STAR 化、PDF 导出，开箱即用，无需后端。
+# 🚀 简历神器 · Awsome Resume
 
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript) ![Vite](https://img.shields.io/badge/Vite-4-646CFF?logo=vite) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?logo=tailwindcss) ![AI Powered](https://img.shields.io/badge/AI-Powered-8B5CF6)
+**AI 驱动的专业简历制作工具 —— 从模板到 Offer，一站搞定**
+
+一款基于 **React 18 + TypeScript + Vite** 构建的开源简历工具。支持多模板切换、岗位定向匹配度分析、AI 一键改写 / 量化 / STAR 化、高质量 PDF 导出，**零后端、零注册、开箱即用**。
+
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/tengx7/awsome-resume?style=social)](https://github.com/tengx7/awsome-resume)
+
+[🌐 在线体验](#快速开始) · [📖 功能特性](#功能特性) · [🗺️ 路线图](#路线图--roadmap) · [🤝 参与贡献](https://github.com/tengx7/awsome-resume/issues)
+
+</div>
 
 ---
 
-## 功能特性
+## ✨ 功能特性
 
-### ✨ AI 助手
+### 🤖 AI 助手
 
 完全由用户自带 Key、浏览器直连，**零后端、零隐私泄露**：
 
@@ -17,7 +30,7 @@
 - **多 Provider 支持**：OpenAI / DeepSeek / OpenRouter / Kimi / Ollama 本地 / 自定义，一键切换
 - **隐私友好**：API Key 仅存本地 `localStorage`，不经任何中间服务器
 
-### 简历模板
+### 🎨 简历模板
 
 内置 **7 套** 专业模板，覆盖不同求职场景：
 
@@ -31,27 +44,27 @@
 | **优雅** | 细衬线 + 留白 | 咨询、法律、高端管理 |
 | **紧凑** | 单页高密度排版 | 多经历资深候选人 |
 
-### 样式定制
+### 🎛️ 样式定制
 
 - **颜色主题**：10+ 种配色一键切换
 - **字体风格**：无衬线 / 衬线 / 等宽 + 国风字体（苹方 / 宋体 / 楷体）
 - **字体大小**：进度条式精细调节（10–18px，步进 0.5px）
-- **自定义预设**：把当前模板+颜色+字体+模块配置保存为预设，支持导入/导出 JSON，随时复用
+- **自定义预设**：把当前模板 + 颜色 + 字体 + 模块配置保存为预设，支持导入 / 导出 JSON，随时复用
 
-### 简历内容模块
+### 📝 简历内容模块
 
 支持以下 8 个独立可编辑模块，**可自由排序、隐藏、重命名**：
 
 - 基本信息（姓名、职位、头像、联系方式、个人简介）
 - 工作经历（公司、职务、时间段、工作描述、量化成就）
 - 教育经历（学校、专业、学历、GPA）
-- 专业技能（分类技能标签，支持批量添加/删除）
+- 专业技能（分类技能标签，支持批量添加 / 删除）
 - 项目经历（项目名称、角色、描述、技术栈、链接）
 - 证书 & 荣誉
 - 语言能力
 - 自定义模块（自由添加任意内容）
 
-### 其他功能
+### 📦 其他功能
 
 - **实时预览**：左侧编辑，右侧即时同步渲染，支持缩放（30%—120%）
 - **PDF 导出**：高质量 A4 格式，导出效果与预览完全一致
@@ -62,7 +75,7 @@
 
 ---
 
-## 快速开始
+## 🚀 快速开始
 
 ### 环境要求
 
@@ -77,8 +90,8 @@
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/wke88/generate-resume.git
-cd generate-resume
+git clone https://github.com/tengx7/awsome-resume.git
+cd awsome-resume
 
 # 2. 安装依赖
 pnpm install
@@ -101,7 +114,7 @@ pnpm preview
 
 ---
 
-## 项目结构
+## 📁 项目结构
 
 ```
 awsome-resume/
@@ -160,7 +173,7 @@ awsome-resume/
 
 ---
 
-## 技术栈
+## 🛠️ 技术栈
 
 | 分类 | 技术 |
 |------|------|
@@ -181,21 +194,17 @@ awsome-resume/
 
 #### 1. AI 一键成稿（Auto-Fill）⭐ 高优先
 
-> 让不会写简历的人，也能在 60 秒内拿到一份专业的简历。
-
-- [ ] **自由表述 → 结构化简历**：用户粘贴一段"自我介绍式"流水账（如"我是小王，北京大学计算机系 2020 届…"），AI 自动解析并**填充到所有模块**，每条工作经历自动拆成 STAR 格式的成就点
+- [ ] **自由表述 → 结构化简历**：用户粘贴一段"自我介绍式"流水账，AI 自动解析并填充到所有模块，每条工作经历自动拆成 STAR 格式的成就点
 - [ ] **支持从已有简历 / LinkedIn 导入**：上传旧版 PDF / DOCX 简历，AI 解析后按新模板重新组织内容
-- [ ] **问答式引导**：对简历空白较多的用户，AI 以聊天形式逐项提问（"上一份工作里你最骄傲的事是什么？"），边聊边自动填表
+- [ ] **问答式引导**：对简历空白较多的用户，AI 以聊天形式逐项提问，边聊边自动填表
 - [ ] **STAR 法则改造**：对每条已填的工作成就，一键检查 S/T/A/R 完整度，缺哪补哪
 
 #### 2. JD 定向一键优化（One-Click Tailor）⭐ 高优先
 
-> 现在已有"匹配度分析 + 分板块建议"，下一步做到**自动执行建议**。
-
-- [ ] **一键对齐 JD**：点一个按钮，AI 基于 JD 自动改写简历中所有相关字段（个人简介 / 工作成就 / 项目描述 / 技能排序），不只是给建议
-- [ ] **Diff 预览 + 多选采纳**：逐字段显示改动前后对比，用户可批量勾选接受 / 拒绝，而非整份覆盖
-- [ ] **多版本简历工作区**：同一份母版派生出"投字节版 / 投腾讯版"，互不干扰，基于同一份事实源
-- [ ] **关键词加粗提示**：在预览里高亮 JD 中要求但简历未覆盖的关键词，给用户明确的补写线索
+- [ ] **一键对齐 JD**：点一个按钮，AI 基于 JD 自动改写简历中所有相关字段，不只是给建议
+- [ ] **Diff 预览 + 多选采纳**：逐字段显示改动前后对比，用户可批量勾选接受 / 拒绝
+- [ ] **多版本简历工作区**：同一份母版派生出"投字节版 / 投腾讯版"，互不干扰
+- [ ] **关键词加粗提示**：在预览里高亮 JD 中要求但简历未覆盖的关键词
 
 #### 3. 矢量 PDF 导出（ATS 友好）
 
@@ -212,7 +221,7 @@ awsome-resume/
 
 #### 5. 投递看板（Job Tracker）
 
-- [ ] 把简历工具升级为**求职工作台**：看板式管理"投递 → 笔试 → 面试 → Offer"
+- [ ] 看板式管理"投递 → 笔试 → 面试 → Offer"
 - [ ] 每个岗位关联一份定向简历 + JD + 面试笔记
 - [ ] 提醒跟进、面试倒计时、拒信分析
 
@@ -231,8 +240,8 @@ awsome-resume/
 ### 🌏 长期愿景（Vision）
 
 - [ ] **多语言版本**：中文 / English / 日本語 / 한국어，对应不同国家简历习惯
-- [ ] **团队版**：校招机构 / 求职辅导老师 批量管理学生简历
-- [ ] **浏览器插件**：在猎聘 / LinkedIn / BOSS 直聘上一键抓取 JD，直接推送到简历神器做定向优化
+- [ ] **团队版**：校招机构 / 求职辅导老师批量管理学生简历
+- [ ] **浏览器插件**：在招聘网站上一键抓取 JD，直接推送到简历神器做定向优化
 - [ ] **数据自托管**：支持对接用户自己的对象存储 / 私有仓库，云端同步但数据归你自己
 
 ### ✅ 已完成（Done）
@@ -246,10 +255,38 @@ awsome-resume/
 - [x] 多 AI Provider 支持（OpenAI / DeepSeek / OpenRouter / Kimi / Ollama / 自定义）
 - [x] 所有 AI 调用浏览器直连，密钥本地存储零后端
 
-> 💡 有想法？欢迎在 [Issues](https://github.com/wke88/generate-resume/issues) 提出建议，或者直接发 PR！
+---
+
+## 🤝 参与贡献
+
+欢迎任何形式的贡献！
+
+1. Fork 本仓库
+2. 创建你的特性分支：`git checkout -b feat/your-feature`
+3. 提交更改：`git commit -m 'feat: add some feature'`
+4. 推送到分支：`git push origin feat/your-feature`
+5. 提交 Pull Request
+
+> 💡 有想法或 Bug？欢迎在 [Issues](https://github.com/tengx7/awsome-resume/issues) 提出！
 
 ---
 
-## 开源协议
+## 📬 联系作者
 
-[MIT License](LICENSE) · 欢迎 Fork、Star 和 PR 贡献。
+<div align="center">
+
+**程序员腾哥** · 专注 AI 工具 & 求职效率提升
+
+扫码添加微信，获取最新动态 👇
+
+<img src="public/wechat-qr.png" width="160" alt="程序员腾哥微信二维码" />
+
+[![GitHub](https://img.shields.io/badge/GitHub-tengx7-181717?logo=github)](https://github.com/tengx7/awsome-resume)
+
+</div>
+
+---
+
+## 📄 开源协议
+
+[MIT License](LICENSE) · 欢迎 Fork、Star ⭐ 和 PR 贡献。

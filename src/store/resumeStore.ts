@@ -48,6 +48,9 @@ interface ResumeStore {
   setFontSize: (size: number) => void;
   setFontFamily: (family: ResumeSettings['fontFamily']) => void;
   toggleShowAvatar: () => void;
+  setLineHeight: (lineHeight: number) => void;
+  setSectionGap: (gap: number) => void;
+  toggleOnePageMode: () => void;
   reorderSections: (sectionOrder: string[]) => void;
   toggleSectionVisible: (key: string) => void;
   renameSectionTitle: (key: string, title: string) => void;
@@ -334,6 +337,21 @@ export const useResumeStore = create<ResumeStore>()(
           settings: { ...state.settings, showAvatar: !state.settings.showAvatar },
         })),
 
+      setLineHeight: (lineHeight) =>
+        set((state) => ({
+          settings: { ...state.settings, lineHeight },
+        })),
+
+      setSectionGap: (sectionGap) =>
+        set((state) => ({
+          settings: { ...state.settings, sectionGap },
+        })),
+
+      toggleOnePageMode: () =>
+        set((state) => ({
+          settings: { ...state.settings, onePageMode: !state.settings.onePageMode },
+        })),
+
       reorderSections: (sectionOrder) =>
         set((state) => ({
           settings: { ...state.settings, sectionOrder },
@@ -369,6 +387,9 @@ export const useResumeStore = create<ResumeStore>()(
               fontFamily: state.settings.fontFamily,
               showAvatar: state.settings.showAvatar,
               pageFormat: state.settings.pageFormat,
+              lineHeight: state.settings.lineHeight,
+              sectionGap: state.settings.sectionGap,
+              onePageMode: state.settings.onePageMode,
               sectionOrder: [...(state.settings.sectionOrder || [])],
               hiddenSections: [...(state.settings.hiddenSections || [])],
               sectionTitles: { ...(state.settings.sectionTitles || {}) },
@@ -448,11 +469,15 @@ export const useResumeStore = create<ResumeStore>()(
         }
         if (!Array.isArray(s.hiddenSections)) s.hiddenSections = [];
         if (!s.sectionTitles || typeof s.sectionTitles !== 'object') s.sectionTitles = {};
+        // v3 新增字段：行高 / 模块间距 / 一页模式
+        if (typeof s.lineHeight !== 'number') s.lineHeight = 1.6;
+        if (typeof s.sectionGap !== 'number') s.sectionGap = 22;
+        if (typeof s.onePageMode !== 'boolean') s.onePageMode = false;
         persistedState.settings = s;
         if (!Array.isArray(persistedState.presets)) persistedState.presets = [];
         return persistedState;
       },
-      version: 2,
+      version: 3,
     }
   )
 );

@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
   <defs>
     <linearGradient id="g1" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#8B5CF6"/>
-      <stop offset="100%" stop-color="#2563EB"/>
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#00A67E"/>
     </linearGradient>
   </defs>
   <rect width="32" height="32" rx="8" fill="url(#g1)"/>
-  <path d="M9 8.5h10l3 3V22a1.5 1.5 0 0 1-1.5 1.5H9A1.5 1.5 0 0 1 7.5 22V10A1.5 1.5 0 0 1 9 8.5Z" fill="#ffffff" opacity="0.95"/>
-  <path d="M19 8.5v2.5a1.5 1.5 0 0 0 1.5 1.5H22" stroke="#8B5CF6" stroke-width="0.8" fill="none" opacity="0.3"/>
-  <rect x="10" y="13" width="8" height="1.4" rx="0.7" fill="#8B5CF6" opacity="0.85"/>
-  <rect x="10" y="16" width="10" height="1.4" rx="0.7" fill="#8B5CF6" opacity="0.55"/>
-  <rect x="10" y="19" width="7" height="1.4" rx="0.7" fill="#8B5CF6" opacity="0.55"/>
+  <path d="M9 8.5h10l3 3V22a1.5 1.5 0 0 1-1.5 1.5H9A1.5 1.5 0 0 1 7.5 22V10A1.5 1.5 0 0 1 9 8.5Z" fill="#ffffff" opacity="0.96"/>
+  <path d="M19 8.5v2.5a1.5 1.5 0 0 0 1.5 1.5H22" stroke="#00A67E" stroke-width="0.8" fill="none" opacity="0.3"/>
+  <rect x="10" y="13" width="8" height="1.4" rx="0.7" fill="#00A67E" opacity="0.85"/>
+  <rect x="10" y="16" width="10" height="1.4" rx="0.7" fill="#00A67E" opacity="0.55"/>
+  <rect x="10" y="19" width="7" height="1.4" rx="0.7" fill="#00A67E" opacity="0.55"/>
   <g transform="translate(22 6)">
     <path d="M3 0L3.7 2.3L6 3L3.7 3.7L3 6L2.3 3.7L0 3L2.3 2.3Z" fill="#FBBF24"/>
   </g>

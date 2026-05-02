@@ -4,11 +4,15 @@
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Inter', system-ui, sans-serif;
   }
 
   body {
     @apply bg-white text-gray-900 antialiased;
+  }
+
+  /* 编辑器页下才锁定滚动（由页面根节点 data-lock-scroll="true" 触发） */
+  body:has([data-lock-scroll="true"]) {
     overflow: hidden;
   }
 
@@ -17,58 +21,189 @@
   }
 }
 
+@layer components {
+  /* ========== 神器主按钮：绿青渐变胶囊 ========== */
+  .zp-btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 px-8 py-3 rounded-full font-semibold text-white transition-all;
+    background-image: linear-gradient(135deg, #4FE0AB 0%, #00A67E 100%);
+    box-shadow: 0 6px 22px rgba(0, 166, 126, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .zp-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgba(0, 166, 126, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  /* ========== 神器次按钮：深黑胶囊 + 描边 ========== */
+  .zp-btn-ghost-dark {
+    @apply inline-flex items-center justify-center gap-1.5 px-7 py-3 rounded-full font-semibold text-white transition-all;
+    background-color: rgba(26, 43, 36, 0.92);
+    border: 1.5px solid rgba(212, 249, 122, 0.55);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  }
+  .zp-btn-ghost-dark:hover {
+    border-color: #D4F97A;
+    background-color: rgba(30, 48, 40, 0.98);
+  }
+
+  /* ========== 毛玻璃卡片（深色背景下用） ========== */
+  .zp-glass {
+    background-color: rgba(20, 35, 28, 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* ========== 深色卡片（模板卡） ========== */
+  .zp-card-dark {
+    @apply rounded-2xl overflow-hidden transition-all;
+    background-color: #152921;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+  .zp-card-dark:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 166, 126, 0.45);
+    box-shadow: 0 14px 48px rgba(0, 166, 126, 0.2), 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+
+  /* 黄绿手绘下划线（4 个顶部 Tab 选中指示） */
+  .zp-doodle-underline {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 12'><path d='M2 8 Q 20 2 40 6 T 78 4' stroke='%23D4F97A' stroke-width='3' stroke-linecap='round' fill='none'/></svg>");
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 80% 10px;
+  }
+}
+
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: #e2e8f0 transparent;
   }
-
   .scrollbar-thin::-webkit-scrollbar {
     width: 4px;
   }
-
   .scrollbar-thin::-webkit-scrollbar-track {
     background: transparent;
   }
-
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background-color: #e2e8f0;
     border-radius: 2px;
   }
+
+  /* 深色滚动条（模板大厅 / 落地页下拉用） */
+  .scrollbar-dark::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-dark::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+  }
+
+  /* 文字渐变（巨型主标题用） */
+  .text-zp-hero-gradient {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8FADA 55%, #EEF3B6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.45);
+  }
 }
 
-/* Override scrollbar globally for editor */
+/* 全局滚动条 */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
   background-color: #e2e8f0;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background-color: #cbd5e1;
 }
 
 /* Print styles */
 @media print {
-  body {
-    overflow: visible !important;
+  /* A4 页面设置 */
+  @page {
+    size: A4 portrait;
+    margin: 0;
   }
 
+  /* 强制打印背景色和背景图（浏览器默认会裁掉背景） */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* 隐藏所有非简历 UI 元素 */
   .no-print {
     display: none !important;
   }
 
-  #resume-preview {
-    box-shadow: none;
-    margin: 0;
-    padding: 0;
+  /* 重置画布容器，让简历自然流动 */
+  .resume-print-canvas {
+    display: block !important;
+    overflow: visible !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    flex: none !important;
   }
+
+  /* 重置 wrapper 的缩放 */
+  .resume-preview-wrapper {
+    transform: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* 简历内容本身 */
+  #resume-preview {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 20mm !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 打印时隐去可编辑 hover 样式 */
+  .editable-text {
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+}
+
+/* ========== 画布内可就地编辑文字 ========== */
+.editable-text {
+  position: relative;
+  display: inline;
+  padding: 0 2px;
+  margin: 0 -2px;
+}
+.editable-text:hover {
+  background-color: rgba(0, 166, 126, 0.06);
+  box-shadow: inset 0 -1px 0 0 rgba(0, 166, 126, 0.35);
+}
+.editable-text:focus {
+  background-color: rgba(0, 166, 126, 0.10);
+  box-shadow: inset 0 0 0 1.5px rgba(0, 166, 126, 0.6);
+}
+.editable-text.is-empty::before {
+  content: attr(data-placeholder);
+  color: #94A3B8;
+  font-style: italic;
+  pointer-events: none;
+}
+.editable-text.is-empty:focus::before {
+  content: '';
 }

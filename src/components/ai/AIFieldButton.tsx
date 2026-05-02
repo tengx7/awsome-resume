@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Sparkles, Loader2, Wand2, Gauge, Target, Minimize2, Maximize2, Languages, Check, X as XIcon } from 'lucide-react';
 import { useAIStore } from '../../store/aiStore';
 import { rewriteTextStream } from '../../services/ai';
@@ -17,7 +18,7 @@ interface AIFieldButtonProps {
   modes?: RewriteMode[];
   /** 按钮尺寸，默认 14 */
   size?: number;
-  /** 文案前缀（默认"AI 改写"） */
+  /** 文案前缀（默认"AI 增强"） */
   label?: string;
 }
 
@@ -37,6 +38,47 @@ const ALL_MODES: ModeMeta[] = [
   { id: 'translate_en', label: '译为英文', icon: Languages, hint: '生成英文简历版本' },
 ];
 
+/** 弹层宽度 */
+const MENU_WIDTH = 208;
+const OUTPUT_WIDTH = 340;
+const GAP = 6;
+
+/**
+ * 把弹层挂到 body（Portal）并按触发按钮位置计算坐标，
+ * 规避父级 overflow 裁剪 + 小容器宽度不足导致内容（例如「采纳」按钮）被遮挡。
+ */
+const useAnchorRect = (ref: React.RefObject<HTMLElement>, open: boolean) => {
+  const [rect, setRect] = useState<DOMRect | null>(null);
+
+  useLayoutEffect(() => {
+    if (!open || !ref.current) return;
+    const calc = () => {
+      if (ref.current) setRect(ref.current.getBoundingClientRect());
+    };
+    calc();
+    window.addEventListener('resize', calc);
+    window.addEventListener('scroll', calc, true); // 捕获任意滚动容器
+    return () => {
+      window.removeEventListener('resize', calc);
+      window.removeEventListener('scroll', calc, true);
+    };
+  }, [open, ref]);
+
+  return rect;
+};
+
+/** 根据 anchor rect + 期望宽度计算 top-right 贴靠坐标（并夹紧到视口内） */
+const positionBelow = (rect: DOMRect | null, width: number) => {
+  if (!rect) return { top: 0, left: 0, visibility: 'hidden' as const };
+  const vw = window.innerWidth;
+  // 右对齐按钮右边
+  let left = rect.right - width;
+  if (left < 8) left = 8;
+  if (left + width > vw - 8) left = vw - 8 - width;
+  const top = rect.bottom + GAP;
+  return { top, left, visibility: 'visible' as const };
+};
+
 export const AIFieldButton: React.FC<AIFieldButtonProps> = ({
   value,
   onApply,
@@ -44,7 +86,7 @@ export const AIFieldButton: React.FC<AIFieldButtonProps> = ({
   className = '',
   modes,
   size = 14,
-  label = 'AI',
+  label = 'AI 增强',
 }) => {
   const { config, isReady, setAssistantOpen, setSettingsOpen } = useAIStore();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -53,19 +95,29 @@ export const AIFieldButton: React.FC<AIFieldButtonProps> = ({
   const [currentMode, setCurrentMode] = useState<RewriteMode | null>(null);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const outputRef = useRef<HTMLDivElement>(null);
 
-  // 点击外部关闭菜单
+  const hasOutput = !!(draft || loading || error);
+
+  const menuRect = useAnchorRect(btnRef, menuOpen);
+  const outputRect = useAnchorRect(btnRef, hasOutput);
+
+  // 点击外部关闭（同时检查按钮/菜单/输出容器）
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen && !hasOutput) return;
     const onDown = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
+      const t = e.target as Node;
+      if (btnRef.current?.contains(t)) return;
+      if (menuRef.current?.contains(t)) return;
+      if (outputRef.current?.contains(t)) return;
+      setMenuOpen(false);
+      // 输出框不在外部点击时强制关闭（避免用户误点丢失 AI 结果），仅关菜单
     };
     document.addEventListener('mousedown', onDown);
     return () => document.removeEventListener('mousedown', onDown);
-  }, [menuOpen]);
+  }, [menuOpen, hasOutput]);
 
   const availableModes = modes
     ? ALL_MODES.filter((m) => modes.includes(m.id))
@@ -80,6 +132,7 @@ export const AIFieldButton: React.FC<AIFieldButtonProps> = ({
     const input = (value || '').trim();
     if (!input) {
       setError('请先填写内容再让 AI 改写');
+      setMenuOpen(false);
       return;
     }
     // 关闭菜单，进入生成状态
@@ -130,27 +183,50 @@ export const AIFieldButton: React.FC<AIFieldButtonProps> = ({
   };
 
   const ready = isReady();
-  const hasOutput = !!(draft || loading || error);
+
+  const menuPos = positionBelow(menuRect, MENU_WIDTH);
+  const outputPos = positionBelow(outputRect, OUTPUT_WIDTH);
 
   return (
-    <div ref={rootRef} className={`relative inline-flex ${className}`}>
-      <button
-        type="button"
-        onClick={() => (ready ? setMenuOpen((v) => !v) : setSettingsOpen(true))}
-        className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-md transition-colors ${
-          ready
-            ? 'text-purple-600 hover:text-purple-700 hover:bg-purple-50'
-            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-        }`}
-        title={ready ? 'AI 智能改写' : '点击配置 AI'}
-      >
-        <Sparkles size={size} />
-        <span>{label}</span>
-      </button>
+    <>
+      <div className={`relative inline-flex ${className}`}>
+        <button
+          ref={btnRef}
+          type="button"
+          onClick={() => {
+            if (!ready) {
+              setSettingsOpen(true);
+              return;
+            }
+            // 有输出时优先切换到菜单（再次改写）
+            setMenuOpen((v) => !v);
+          }}
+          className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-md transition-colors ${
+            ready
+              ? 'text-purple-600 hover:text-purple-700 hover:bg-purple-50'
+              : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+          }`}
+          title={ready ? 'AI 智能改写' : '点击配置 AI'}
+        >
+          <Sparkles size={size} />
+          <span>{label}</span>
+        </button>
+      </div>
 
-      {/* 模式下拉菜单 */}
-      {menuOpen && ready && (
-        <div className="absolute top-full right-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-30 py-1">
+      {/* ============ Portal：模式下拉菜单 ============ */}
+      {menuOpen && ready && createPortal(
+        <div
+          ref={menuRef}
+          style={{
+            position: 'fixed',
+            top: menuPos.top,
+            left: menuPos.left,
+            width: MENU_WIDTH,
+            visibility: menuPos.visibility,
+            zIndex: 1000,
+          }}
+          className="bg-white border border-gray-200 rounded-lg shadow-xl py-1"
+        >
           {availableModes.map((m) => {
             const Icon = m.icon;
             return (
@@ -180,12 +256,25 @@ export const AIFieldButton: React.FC<AIFieldButtonProps> = ({
             <Target size={13} />
             <span className="text-xs font-medium">打开 AI 助手（JD 对齐）</span>
           </button>
-        </div>
+        </div>,
+        document.body,
       )}
 
-      {/* 生成结果浮窗 */}
-      {hasOutput && (
-        <div className="absolute top-full right-0 mt-1 w-[340px] max-w-[80vw] bg-white border border-purple-200 rounded-lg shadow-xl z-30 p-3">
+      {/* ============ Portal：生成结果浮窗 ============ */}
+      {hasOutput && createPortal(
+        <div
+          ref={outputRef}
+          style={{
+            position: 'fixed',
+            top: outputPos.top,
+            left: outputPos.left,
+            width: OUTPUT_WIDTH,
+            maxWidth: 'calc(100vw - 16px)',
+            visibility: outputPos.visibility,
+            zIndex: 1001,
+          }}
+          className="bg-white border border-purple-200 rounded-lg shadow-2xl p-3"
+        >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-purple-700">
               {loading ? (
@@ -233,8 +322,9 @@ export const AIFieldButton: React.FC<AIFieldButtonProps> = ({
               </button>
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
-    </div>
+    </>
   );
 };

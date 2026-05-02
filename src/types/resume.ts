@@ -88,7 +88,8 @@ export type TemplateId =
   | 'creative'
   | 'tech'
   | 'elegant'
-  | 'compact';
+  | 'hello'
+  | 'gradient';
 
 export type FontFamily =
   | 'sans'
@@ -124,6 +125,12 @@ export interface ResumeSettings {
   hiddenSections: string[];
   /** 自定义栏目标题：key -> 用户自定义的显示名 */
   sectionTitles: Record<string, string>;
+  /** 行高倍率，范围 1.2 ~ 2.0，默认 1.6（"行高"滑块） */
+  lineHeight: number;
+  /** 模块之间的垂直间距，单位 px，默认 22（"模块间距"滑块） */
+  sectionGap: number;
+  /** 是否强制压缩为一页（启用时渲染层会尝试使用更紧凑的行高/模块间距） */
+  onePageMode: boolean;
 }
 
 /** 自定义模板预设：一份完整的外观配置快照 */

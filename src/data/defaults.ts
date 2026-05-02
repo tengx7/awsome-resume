@@ -19,6 +19,16 @@ export const FONT_FAMILY_CSS: Record<FontFamily, string> = FONT_FAMILIES.reduce(
 
 export const COLOR_THEMES: ColorTheme[] = [
   {
+      // 神器品牌绿，作为默认主题
+      id: 'zhipin',
+      name: '神器绿',
+    primary: '#00A67E',
+    secondary: '#067E5F',
+    accent: '#D6F5EB',
+    text: '#0F172A',
+    background: '#ffffff',
+  },
+  {
     id: 'blue',
     name: '经典蓝',
     primary: '#2563eb',
@@ -248,23 +258,28 @@ export const DEFAULT_RESUME_DATA: ResumeData = {
 };
 
 export const DEFAULT_SETTINGS: ResumeSettings = {
-  templateId: 'modern',
+  // 默认使用“标准”模板（对应 ElegantTemplate 的新样式）
+  templateId: 'elegant',
   colorTheme: COLOR_THEMES[0],
   fontSize: 12,
-  fontFamily: 'sans',
-  showAvatar: false,
+  fontFamily: 'pingfang',
+  showAvatar: true,
   pageFormat: 'A4',
+  // 默认以「教育经历 → 工作经历」开头，贴近主流示例
   sectionOrder: [
-    'workExperience',
     'education',
-    'skills',
+    'workExperience',
     'projects',
+    'skills',
     'certificates',
     'languages',
     'customSections',
   ],
   hiddenSections: [],
   sectionTitles: {},
+  lineHeight: 1.6,
+  sectionGap: 22,
+  onePageMode: false,
 };
 
 /** 各模块的默认标题（中文） */

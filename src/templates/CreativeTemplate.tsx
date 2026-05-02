@@ -1,6 +1,14 @@
 import React from 'react';
 import { ResumeData, ResumeSettings } from '../types/resume';
-import { makeFsScaler, getSectionTitle, getVisibleOrderedKeys, FONT_FAMILY_CSS } from './_utils';
+import { FONT_FAMILY_CSS } from './_utils';
+import { EditableText } from '../components/editable/EditableText';
+import { useResumeStore } from '../store/resumeStore';
+import {
+  useTemplateCtx,
+  buildContentRenderers,
+  visibleKeys,
+  CommonIcon,
+} from './_common';
 
 interface TemplateProps {
   data: ResumeData;
@@ -8,255 +16,77 @@ interface TemplateProps {
 }
 
 /**
- * CreativeTemplate —— 创意风格
- * 特点：左侧彩色装饰竖条 + 姓名超大字号 + 卡片式模块
+ * CreativeTemplate —— 「幸运红」
+ * 对标 pdf_6：深红顶栏 + 白姓名 + 右上角小圆点装饰 + 圆角白内容卡片。
  */
 export const CreativeTemplate: React.FC<TemplateProps> = ({ data, settings }) => {
-  const { personal, workExperience, education, skills, projects, certificates, languages, customSections } = data;
-  const { colorTheme, fontSize, fontFamily } = settings;
+  const ctx = useTemplateCtx(data, settings);
+  const { personal } = data;
+  const { fs, lh, gap } = ctx;
+  const { updatePersonal } = useResumeStore();
 
-  const fs = makeFsScaler(fontSize);
-  const fontFamilyMap = FONT_FAMILY_CSS;
+  const bannerColor = '#A6192E'; // 深红（参考 PDF）
+  const pageBg = '#FDF5F5';
 
   const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-    <section style={{ marginBottom: '20px' }}>
-      <h2
-        style={{
-          margin: '0 0 10px 0',
-          fontSize: fs(14),
-          fontWeight: 700,
-          color: colorTheme.primary,
-          display: 'inline-block',
-          padding: '4px 12px',
-          borderRadius: '4px',
-          background: colorTheme.accent,
-        }}
-      >
+    <section style={{ marginBottom: `${gap}px` }}>
+      <h2 style={{
+        display: 'inline-block',
+        margin: '0 0 10px 0', height: 26,
+        fontSize: fs(13), fontWeight: 700, lineHeight: '26px',
+        color: '#FFFFFF', background: bannerColor,
+        padding: '0 14px', borderRadius: 999,
+      }}>
         {title}
       </h2>
-      <div>{children}</div>
+      <div style={{ paddingLeft: 2 }}>{children}</div>
     </section>
   );
 
-  const sectionRenderers: Record<string, () => React.ReactNode> = {
-    workExperience: () =>
-      workExperience.length > 0 && (
-        <Section key="workExperience" title={getSectionTitle(settings, 'workExperience', '工作经历')}>
-          {workExperience.map((exp) => (
-            <div
-              key={exp.id}
-              style={{
-                marginBottom: '12px',
-                padding: '10px 12px',
-                borderLeft: `3px solid ${colorTheme.primary}`,
-                background: '#fafafa',
-                borderRadius: '0 6px 6px 0',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <div>
-                  <span style={{ fontSize: fs(13), fontWeight: 700, color: colorTheme.primary }}>{exp.position || '职位名称'}</span>
-                  <span style={{ fontSize: fs(12), color: '#475569' }}> @ {exp.company}</span>
-                </div>
-                <span style={{ fontSize: fs(11), color: '#94a3b8' }}>{exp.startDate} — {exp.current ? '至今' : exp.endDate}</span>
-              </div>
-              {exp.description && <p style={{ margin: '6px 0 4px 0', fontSize: fs(11.5), color: '#475569', lineHeight: 1.5 }}>{exp.description}</p>}
-              {exp.achievements?.length > 0 && (
-                <ul style={{ margin: '4px 0 0 0', paddingLeft: '18px', fontSize: fs(11.5), lineHeight: 1.6, color: '#334155' }}>
-                  {exp.achievements.map((a, i) => <li key={i}>{a}</li>)}
-                </ul>
-              )}
-            </div>
-          ))}
-        </Section>
-      ),
-    education: () =>
-      education.length > 0 && (
-        <Section key="education" title={getSectionTitle(settings, 'education', '教育经历')}>
-          {education.map((edu) => (
-            <div key={edu.id} style={{ marginBottom: '8px', fontSize: fs(11.5) }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 700 }}>{edu.school}</span>
-                <span style={{ color: '#94a3b8' }}>{edu.startDate} — {edu.endDate}</span>
-              </div>
-              <p style={{ margin: '2px 0', color: colorTheme.primary }}>{edu.degree} · {edu.major}</p>
-              {edu.description && <p style={{ margin: '2px 0 0 0', color: '#64748b' }}>{edu.description}</p>}
-            </div>
-          ))}
-        </Section>
-      ),
-    skills: () =>
-      skills.length > 0 && (
-        <Section key="skills" title={getSectionTitle(settings, 'skills', '技能')}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {skills.map((s) => (
-              <div key={s.id} style={{ fontSize: fs(11.5) }}>
-                <span style={{ fontWeight: 700, color: colorTheme.primary }}>{s.category}</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
-                  {s.items.map((item, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        padding: '2px 8px',
-                        fontSize: fs(10.5),
-                        background: colorTheme.accent,
-                        color: colorTheme.secondary,
-                        borderRadius: '10px',
-                      }}
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Section>
-      ),
-    projects: () =>
-      projects.length > 0 && (
-        <Section key="projects" title={getSectionTitle(settings, 'projects', '项目经历')}>
-          {projects.map((p) => (
-            <div key={p.id} style={{ marginBottom: '10px', fontSize: fs(11.5) }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 700, color: colorTheme.primary }}>{p.name}</span>
-                <span style={{ color: '#94a3b8' }}>{p.startDate} — {p.endDate}</span>
-              </div>
-              {p.role && <p style={{ margin: '2px 0', color: '#64748b' }}>{p.role}</p>}
-              {p.description && <p style={{ margin: '2px 0', color: '#475569', lineHeight: 1.5 }}>{p.description}</p>}
-              {p.technologies?.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
-                  {p.technologies.map((t, i) => (
-                    <span key={i} style={{ fontSize: fs(10), color: colorTheme.primary }}>#{t}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </Section>
-      ),
-    certificates: () =>
-      certificates.length > 0 && (
-        <Section key="certificates" title={getSectionTitle(settings, 'certificates', '证书荣誉')}>
-          {certificates.map((c) => (
-            <div key={c.id} style={{ fontSize: fs(11.5), marginBottom: '4px', display: 'flex', justifyContent: 'space-between' }}>
-              <span>
-                <strong>{c.name}</strong>
-                {c.issuer && <span style={{ color: '#64748b' }}> — {c.issuer}</span>}
-              </span>
-              <span style={{ color: '#94a3b8' }}>{c.date}</span>
-            </div>
-          ))}
-        </Section>
-      ),
-    languages: () =>
-      languages.length > 0 && (
-        <Section key="languages" title={getSectionTitle(settings, 'languages', '语言能力')}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-            {languages.map((l) => (
-              <span
-                key={l.id}
-                style={{
-                  padding: '2px 10px',
-                  fontSize: fs(11),
-                  background: colorTheme.accent,
-                  color: colorTheme.secondary,
-                  borderRadius: '12px',
-                }}
-              >
-                {l.name} · {l.level}
-              </span>
-            ))}
-          </div>
-        </Section>
-      ),
-    customSections: () =>
-      customSections.length > 0 && (
-        <React.Fragment key="customSections">
-          {customSections.map((s) => (
-            <Section key={s.id} title={s.title}>
-              <p style={{ margin: 0, fontSize: fs(11.5), lineHeight: 1.6, whiteSpace: 'pre-wrap', color: '#334155' }}>{s.content}</p>
-            </Section>
-          ))}
-        </React.Fragment>
-      ),
-  };
+  const renderers = buildContentRenderers(ctx, Section);
+  const order = visibleKeys(ctx, Object.keys(renderers));
 
-  const orderedKeys = getVisibleOrderedKeys(settings, Object.keys(sectionRenderers));
+  // 右上角装饰小圆点
+  const Dots = () => (
+    <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+      {[0, 1, 2, 3].map((i) => (
+        <span key={i} style={{ width: 4, height: 4, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.65)', display: 'inline-block' }} />
+      ))}
+      <span style={{ width: 14, height: 14, borderRadius: '50%', border: '1.5px solid rgba(255,255,255,0.7)',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.7)' }} />
+      </span>
+    </div>
+  );
 
   return (
-    <div
-      id="resume-preview"
-      style={{
-        width: '210mm',
-        minHeight: '297mm',
-        fontFamily: fontFamilyMap[fontFamily],
-        fontSize: fs(12),
-        color: colorTheme.text,
-        backgroundColor: colorTheme.background,
-        display: 'flex',
-      }}
-    >
-      {/* 左侧彩色装饰条 */}
-      <div
-        style={{
-          width: '10mm',
-          background: `linear-gradient(180deg, ${colorTheme.primary}, ${colorTheme.secondary})`,
-          flexShrink: 0,
-        }}
-      />
-      {/* 主要内容 */}
-      <div style={{ flex: 1, padding: '20mm 18mm' }}>
-        {/* Header */}
-        <header style={{ marginBottom: '22px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {settings.showAvatar && personal.avatar && (
-            <img
-              src={personal.avatar}
-              alt={personal.name}
-              style={{
-                width: '68px',
-                height: '68px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: `3px solid ${colorTheme.primary}`,
-              }}
-            />
-          )}
-          <div style={{ flex: 1 }}>
-            <h1 style={{ margin: 0, fontSize: fs(32), fontWeight: 800, color: colorTheme.primary, letterSpacing: '-0.5px' }}>
-              {personal.name || '您的姓名'}
-            </h1>
-            <p style={{ margin: '2px 0 8px 0', fontSize: fs(13), color: '#64748b', fontWeight: 500 }}>{personal.title}</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', fontSize: fs(10.5), color: '#475569' }}>
-              {personal.email && <span>✉ {personal.email}</span>}
-              {personal.phone && <span>✆ {personal.phone}</span>}
-              {personal.location && <span>⊙ {personal.location}</span>}
-              {personal.website && <span>⊞ {personal.website}</span>}
-              {personal.github && <span>⊕ {personal.github}</span>}
-              {personal.linkedin && <span>in {personal.linkedin}</span>}
-            </div>
-          </div>
-        </header>
+    <div id="resume-preview" style={{
+      width: '210mm', minHeight: '297mm', background: pageBg,
+      fontFamily: FONT_FAMILY_CSS[settings.fontFamily],
+      fontSize: fs(12), color: settings.colorTheme.text, lineHeight: lh, boxSizing: 'border-box',
+    }}>
+      {/* 顶部深红 banner */}
+      <header style={{ background: bannerColor, color: '#FFFFFF', padding: '14mm 16mm 16mm', position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 14, right: 16 }}><Dots /></div>
+        <EditableText as="h1" value={personal.name} placeholder="姓名"
+          onCommit={(v) => updatePersonal({ name: v })}
+          style={{ margin: 0, fontSize: fs(30), fontWeight: 800, color: '#FFFFFF',
+            letterSpacing: 2, lineHeight: 1.1, display: 'block' }} />
+        <div style={{ marginTop: 10, fontSize: fs(11.5), color: 'rgba(255,255,255,0.85)',
+          display: 'flex', flexWrap: 'wrap', gap: '4px 18px', alignItems: 'center', lineHeight: 1.6 }}>
+          {personal.phone && <span>男 | {personal.phone}</span>}
+          {personal.email && <span style={{ whiteSpace: 'nowrap' }}>
+            <CommonIcon type="mail" color="#FFFFFF" size={13} /><span style={{ marginLeft: 5 }}>{personal.email}</span></span>}
+        </div>
+      </header>
 
-        {/* Summary */}
-        {personal.summary && (
-          <section
-            style={{
-              marginBottom: '22px',
-              padding: '10px 14px',
-              borderRadius: '6px',
-              background: colorTheme.accent,
-              fontSize: fs(11.5),
-              lineHeight: 1.6,
-              color: colorTheme.secondary,
-            }}
-          >
-            {personal.summary}
-          </section>
-        )}
-
-        {/* Sections by order */}
-        {orderedKeys.map((key) => sectionRenderers[key]?.())}
+      {/* 白色圆角主卡片 */}
+      <div style={{
+        margin: '-6mm 8mm 8mm 8mm', padding: '14mm 14mm 10mm 14mm',
+        background: '#FFFFFF', borderRadius: 10, boxShadow: '0 1px 6px rgba(166,25,46,0.06)',
+      }}>
+        {order.map((k) => renderers[k]?.())}
       </div>
     </div>
   );
